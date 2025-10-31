@@ -1,0 +1,111 @@
+:root {
+  --myGreen: #1ad846;
+  --broFont: ;
+}
+::selection {
+  background: yellow;
+}
+@media print {
+  nav {
+    display: none;
+  }
+}
+h1 {
+  font-family: "Montserrat", sans-serif;
+  text-transform: uppercase;
+  color: #2c3e50;
+  text-align: center;
+  letter-spacing: 4px;
+  background: radial-gradient(circle, #ff7e5f, #feb47b);
+}
+.container {
+  width: 90%;
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 70%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: 50%;
+  }
+}
+
+div {
+  border: 10px solid transparent;
+  border-image: url("src/pumpkins-9135128_1280.jpg") 30 round;
+}
+div {
+  --text-color: black;
+  color: var(--text-color);
+}
+section div {
+  --text-color: orange;
+}
+div:hover {
+  transform: scale(1.1) rotate(5deg);
+  transition: transform 0.3s ease;
+}
+button {
+  background: steelblue;
+  color: white;
+  transition: background 0.3s ease;
+}
+button:hover {
+  background-color: navy;
+  color: white;
+}
+button:focus {
+  outline: 2px solid blue;
+}
+p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+p:hover::after {
+  content: " (hovered)";
+  color: gray;
+}
+p::first-letter {
+  color: plum;
+}
+p::first-line {
+  font-weight: bold;
+}
+p::before {
+  content: "→ ";
+}
+p {
+  color: var(--myGreen) !important;
+} /* highest */
+p {
+  color: var(--myGreen);
+  font-family: var(--broFont);
+} /* lowest priority */
+.pClass {
+  color: saddlebrown;
+  background: conic-gradient(red, yellow, green, blue, red);
+} /* low priority */
+#para1 {
+  color: blue;
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+} /* higher priority */
+input[type="url"] {
+  border: 3px solid rgb(120, 0, 0);
+}
+input:focus::placeholder {
+  color: transparent;
+}
+a[target="_blank"] {
+  color: red;
+}
+a:hover {
+  color: orange;
+}
+input:focus {
+  border-color: blue;
+}

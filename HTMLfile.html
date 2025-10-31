@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="CSSfile.css" />
+    <title>Document</title>
+    <style>
+      body {
+        background: #fafafa;
+      }
+      header {
+        color: navy;
+        text-align: center;
+      }
+      p {
+        color: gray;
+        font-size: 14px;
+      }
+    </style>
+    <style>
+      .box {
+        width: 200px;
+        padding: 20px;
+        border: 5px solid blue;
+        margin: 10px;
+        background: lightgray;
+      }
+      .container1 {
+        width: 300px;
+        border: 10px solid red;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+    </style>
+    <style>
+      span {
+        display: block;
+        background: yellow;
+      }
+    </style>
+    <style>
+      img {
+        float: left;
+        margin: 10px;
+      }
+    </style>
+    <style>
+      div {
+        clear: both;
+      }
+    </style>
+    <style>
+      .card2 {
+        float: left;
+        width: 200px;
+        height: 100px;
+        margin: 10px;
+        background: lightblue;
+      }
+      .container2::after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+    </style>
+    <style>
+      .flex-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 150px;
+        background: lightgray;
+      }
+      .flex-item {
+        background: steelblue;
+        color: white;
+        padding: 10px;
+      }
+    </style>
+    <style>
+      .container {
+        display: grid;
+        grid-template-areas:
+          "header header"
+          "sidebar main"
+          "footer footer";
+        grid-template-columns: 150px 1fr;
+        grid-template-rows: 60px 200px 50px;
+        gap: 5px;
+      }
+      .header {
+        grid-area: header;
+        background: #3b5998;
+      }
+      .sidebar {
+        grid-area: sidebar;
+        background: #8b9dc3;
+      }
+      .main {
+        grid-area: main;
+        background: #dfe3ee;
+      }
+      .footer {
+        grid-area: footer;
+        background: #3b5998;
+        color: white;
+      }
+    </style>
+    <style>
+      #colorsUnits {
+        width: 50%;
+        height: 100px;
+        background: linear-gradient(to right, #f00, rgba(0, 0, 255, 0.5));
+      }
+    </style>
+    <style>
+      @keyframes slideIn {
+        from {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .alert {
+        animation: slideIn 0.5s ease-out forwards;
+      }
+      .alert {
+        width: 200px;
+        height: 120px;
+        background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        border: 2px solid #333;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+    <style>
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .animationBox {
+        width: 100px;
+        height: 100px;
+        background: coral;
+        animation: pulse 1.5s infinite ease-in-out;
+      }
+    </style>
+    <style>
+      .media-container {
+        display: flex;
+        flex-direction: row;
+      }
+      .media-box {
+        flex: 1;
+        margin: 10px;
+        height: 100px;
+        background: coral;
+      }
+
+      @media (max-width: 600px) {
+        .media-container {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header><h1>Site Header</h1></header>
+    <nav>
+      <div class="flex-container">
+        <div class="flex-item">display:flex Navigation</div>
+        <div class="flex-item">1</div>
+        <div class="flex-item">2</div>
+        <div class="flex-item">3</div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="header">Header</div>
+      <div class="sidebar">Sidebar</div>
+      <div class="main">Main</div>
+      <div class="footer">Footer</div>
+    </div>
+    <main>
+      <article>
+        <section>
+          <h2>Article Title</h2>
+          <div id="colorsUnits">To test colors & units</div>
+          <div class="box">
+            Box Model (box-sizing: content-box; /* default */)
+          </div>
+          <div class="container1">
+            Box Model (* { box-sizing: border-box; } /* common in modern CSS */)
+          </div>
+          <div class="container2">
+            <div class="card2">float card2</div>
+            <div class="card2">float card2</div>
+          </div>
+          <p>Text <span>now block</span> continues below.</p>
+          <p>
+            Text wraps around the floated image
+            <img src="src/logo-2582747_1280.png" width="100" /> smoothly.
+          </p>
+          <p>Wrapped text.</p>
+          <div>Next section starts below floated image.</div>
+          <p>
+            inlineless,idless,classless,...
+            <a href="https://github.com/amaan-123" target="_blank"
+              >This is a link to my github that opens in a new tab</a
+            >
+          </p>
+          <p class="pClass">pClass...</p>
+          <p class="pClass" id="para1">
+            ID para1 <strong>Warning:</strong> Do not share your password.
+          </p>
+          <p style="color: darkcyan">
+            Internal: This is <em>really</em> important.
+          </p>
+          <div class="animationBox">animationBox</div>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente
+            sint excepturi cupiditate voluptatibus nesciunt perferendis aliquid
+            sequi corporis ab deleniti, distinctio, incidunt commodi nulla. In
+            possimus fuga placeat consequatur laborum.
+          </p>
+        </section>
+        <section>
+          <div class="media-container">
+            <div class="media-box">media-query</div>
+            <div class="media-box">media-query</div>
+            <div class="media-box">media-query</div>
+          </div>
+          <canvas id="myCanvas" width="200" height="100"></canvas>
+          <script>
+            const c = document.getElementById("myCanvas");
+            const ctx = c.getContext("2d");
+            ctx.fillStyle = "blue";
+            ctx.fillRect(20, 20, 150, 50);
+          </script>
+        </section>
+        <section>
+          <form>
+            <input type="email" placeholder="Enter email" />
+            <input type="date" />
+            <input type="number" min="0" max="100" />
+            <input type="url" placeholder="Enter URL" />
+            <input type="color" />
+            <input type="range" min="0" max="10" />
+            <button type="reset">Reset</button>
+            <button type="submit">Submit</button>
+          </form>
+          <form action="/hero.html" method="post" target="_blank">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="username" required />
+            <label for="married">Marital Status:</label>
+            <input type="checkbox" name="marital" id="married" />
+            <label for="country">Country:</label>
+            <select id="country" name="country" required>
+              <option value="" disabled selected>Select a country</option>
+              <option value="us">United States</option>
+              <option value="ca">Canada</option>
+              <option value="gb">United Kingdom</option>
+              <option value="au">Australia</option>
+            </select>
+            <label for="fileatt">Attach File:</label>
+            <input type="file" name="file" id="fileatt" />
+            <input type="submit" value="Submit" />
+          </form>
+          <form action="/login" method="post">
+            <label>Email:</label>
+            <input type="email" name="email" required />
+
+            <label>Password:</label>
+            <input type="password" name="pwd" minlength="6" required />
+
+            <button type="submit">Login</button>
+          </form>
+        </section>
+        <section>
+          <div class="alert">SlideIn</div>
+        </section>
+      </article>
+      <aside>Related Links</aside>
+    </main>
+    <footer>Footer Info</footer>
+  </body>
+</html>
