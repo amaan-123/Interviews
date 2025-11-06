@@ -241,12 +241,6 @@
             <div class="media-box">media-query</div>
           </div>
           <canvas id="myCanvas" width="200" height="100"></canvas>
-          <script>
-            const c = document.getElementById("myCanvas");
-            const ctx = c.getContext("2d");
-            ctx.fillStyle = "blue";
-            ctx.fillRect(20, 20, 150, 50);
-          </script>
         </section>
         <section>
           <form>
@@ -259,7 +253,7 @@
             <button type="reset">Reset</button>
             <button type="submit">Submit</button>
           </form>
-          <form action="/hero.html" method="post" target="_blank">
+          <form action="hero.html" method="post" target="_blank">
             <label for="name">Name:</label>
             <input type="text" id="name" name="username" required />
             <label for="married">Marital Status:</label>
@@ -285,13 +279,39 @@
 
             <button type="submit">Login</button>
           </form>
+          <form>
+            <fieldset>
+              <legend>Personal Info</legend>
+              <label>Name: <input type="text" required /></label>
+              <label>Email: <input type="email" required /></label>
+            </fieldset>
+          </form>
         </section>
         <section>
           <div class="alert">SlideIn</div>
+          <h2 id="title">Hello</h2>
+          <div class="box">Select Me!!</div>
+          <div class="box">Select Me 2!!</div>
+          <div class="box">Select Me 3!!</div>
         </section>
       </article>
       <aside>Related Links</aside>
     </main>
     <footer>Footer Info</footer>
+    <script>
+      const c = document.getElementById("myCanvas");
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "blue";
+      ctx.fillRect(20, 20, 150, 50);
+    </script>
+    <script>
+      const title = document.getElementById("title");
+      console.log(title.textContent); // Hello
+
+      const boxes = document.querySelectorAll(".box");
+      boxes.forEach((box) => {
+        console.log(box.textContent);
+      });
+    </script>
   </body>
 </html>

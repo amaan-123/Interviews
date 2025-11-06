@@ -1,11 +1,315 @@
+## Technical Interview mistakes
+
+- Thouroughly prepare all in CV(even if learnt long time ago but relevant). Don't hesitate in including things in your CV that you have done, but avoid writing what you can't answer for.
+- Normalisation show on paper
+- Entity & attributes
+- JOIN query: two tables: employee & department, write select statement
+- Can objects be created for abstract classes
+- Two different inherited interfaces with the same property "Name", implemented by another derived class
+
+Direct answers below, concise and correct.
+
+**1) High-level Normalization**
+Normalization is a set of rules to structure a relational schema to reduce redundancy and anomalies (insert/update/delete) by splitting data into related tables and using keys.
+
+- **1NF**: Atomic values. Each column holds indivisible values. No repeating groups.
+- **2NF**: 1NF + every non-key column fully depends on the whole primary key. (Removes partial dependencies; relevant for composite keys.)
+- **3NF**: 2NF + no transitive dependency. Non-key columns depend only on the primary key, not on other non-key columns.
+- **BCNF**: Stronger than 3NF. Every functional dependency X → Y requires X to be a superkey. Use for tricky dependency cases.
+
+When to stop: choose the highest normal form that balances reduced redundancy vs. performance/complexity. Typical OLTP: 3NF (or BCNF if needed). Denormalize only for performance with justification.
+
+---
+
+**2) Entity & Attributes — and relation to normalization**
+
+- **Entity**: a real-world object or concept represented by a table (e.g., `Employee`, `Department`).
+- **Attribute**: a property/column of that entity (e.g., `Employee.id`, `Employee.name`, `Employee.dept_id`).
+- **Relation to normalization**: normalization examines attributes and their dependencies to decide if attributes should live in the same table or be moved to another table.
+
+  - Primary key identifies the entity.
+  - Foreign keys represent relationships between entities.
+  - Functional dependencies between attributes determine whether to split tables (to satisfy 2NF/3NF/BCNF).
+
+Example: if `Employee` has `dept_name` and `department` also stores `dept_name`, that is redundant. Normalization moves `dept_name` to `Department` and `Employee` stores `dept_id` as a FK.
+
+---
+
+**3) JOIN query (employee & department)**
+
+Basic inner join selecting all employee columns with their department name:
+
+```sql
+SELECT e.*, d.name AS department_name
+FROM employee e
+JOIN department d
+  ON e.dept_id = d.id;
+```
+
+Variants:
+
+- Use `LEFT JOIN` if you want employees even when `dept_id` is NULL or no matching department.
+- If you want unique departments from the join:
+
+```sql
+SELECT DISTINCT d.id, d.name
+FROM employee e
+JOIN department d
+  ON e.dept_id = d.id;
+```
+
+Note: correct syntax is `SELECT DISTINCT columns` or `SELECT DISTINCT *`. `SELECT */DISTINCT` is invalid.
+
+**About `DISTINCT` vs `GROUP BY`**
+
+- `DISTINCT` removes duplicate result rows. Use it when you want unique rows and no aggregation.
+- `GROUP BY` groups rows for aggregation (COUNT, SUM, AVG). SQL requires that every selected non-aggregated column must appear in `GROUP BY`. Use `GROUP BY` when you need aggregates.
+
+Example: count employees per department:
+
+```sql
+SELECT d.id, d.name, COUNT(*) AS employee_count
+FROM department d
+LEFT JOIN employee e
+  ON e.dept_id = d.id
+GROUP BY d.id, d.name;
+```
+
+Do not use `GROUP BY` as a substitute for `DISTINCT` unless you are aggregating.
+
+---
+
+**4) Can objects be created for abstract classes?**
+
+- **No.** Abstract classes cannot be instantiated directly. They can define abstract members that subclasses implement.
+- You can declare a variable of the abstract type and assign it an instance of a concrete subclass.
+
+C# example:
+
+```csharp
+abstract class Animal { public abstract void Speak(); }
+class Dog : Animal { public override void Speak() => Console.WriteLine("Woof"); }
+
+// invalid: var a = new Animal(); // compile error
+Animal a = new Dog(); // valid
+a.Speak(); // calls Dog.Speak
+```
+
+---
+
+**5) Two interfaces A & B both define `Name`. How can class C implement them differently?**
+
+In **C#** use *explicit interface implementation* to provide separate implementations for each interface member:
+
+```csharp
+interface IA { string Name { get; } }
+interface IB { string Name { get; } }
+
+class C : IA, IB
+{
+    // default/public implementation (optional)
+    public string Name => "Default";
+
+    // explicit implementations for distinct behavior
+    string IA.Name => "IA.Name implementation";
+    string IB.Name => "IB.Name implementation";
+}
+
+// usage:
+C c = new C();
+Console.WriteLine(((IA)c).Name); // "IA.Name implementation"
+Console.WriteLine(((IB)c).Name); // "IB.Name implementation"
+Console.WriteLine(c.Name);       // "Default" (the public one)
+```
+
+Notes:
+
+- Explicit implementations are accessible only when the instance is cast to that interface.
+- For methods the pattern is the same:
+
+```csharp
+void IA.Do() { /* IA behavior */ }
+void IB.Do() { /* IB behavior */ }
+```
+
+In **Java**: if both interfaces declare the same method signature (no conflict) a single class method satisfies both. To provide different behaviors you must use helper methods or adapter objects because Java does not support explicit interface implementation like C#. If interfaces have `default` methods with different implementations, the class must override and resolve the conflict by providing its own method.
+
+---
+
+# C# Logical test code review
+
+Clear. Your code works but has small bugs, inefficiencies, and edge cases to note. Below I’ll (1) explain what each part does, (2) point out issues, (3) give a corrected, cleaner version, and (4) list complexity and edge-case notes.
+
+---
+
+### 1) What the code does (step-by-step)
+
+1. Reads `N` from the console and validates it is an integer in `[1, 200000]`.
+2. Reads a space-separated line of integers. Splits it into strings and parses each to `int`, adding valid ints to `unsortedSeq`. If any token is not an integer it prints `"Not a num"` and exits.
+3. Sorts the list of integers. (You call sort twice — redundant.)
+4. Iterates adjacent pairs in the sorted array. For any adjacent pair where the difference is greater than 1 it repeatedly adds the missing integers between them to `missingNums`.
+
+   - Example pair `3` and `6` adds `4`, `5`.
+5. If `missingNums` is non-empty it prints them comma-separated; otherwise prints `"None missing"`.
+
+---
+
+### 2) Bugs / style / inefficiency issues
+
+- **Syntax bug:** `unsortedSeq.Sort()` in your snippet misses a semicolon.
+- **Double sort:** You call `unsortedSeq.Sort()` then convert to array and `Array.Sort(seqToSort)`. Only one sort is needed.
+- **Inefficient/buggy printing loop:** You use `foreach (int num in missingNums)` and inside check `missingNums.IndexOf(num)`. That makes printing O(M²) and can be wrong if duplicates exist (IndexOf finds first occurrence). Use indexed `for` or `string.Join`.
+- **No check vs `N`:** You read `N` but commented out the `numString.Length == N` check. If you need to enforce the provided count do that validation.
+- **Potential heavy memory:** If the gap between min and max is huge, `missingNums` can become very large and may exhaust memory. Example: `-1_000_000_000` and `1_000_000_000` would generate 2 billion missing ints — impossible.
+- **Duplicates:** Your logic assumes distinct integers. The prompt says distinct but if duplicates appear the `seqToSort[i+1] - seqToSort[i]` could be zero or negative and the loop still works but produce wrong results unless you deduplicate.
+- **Output formatting:** Your code prints comma with no space. That matches the sample but if you prefer human-friendly output use `", "`.
+
+---
+
+### 3) Clean, corrected and safer version
+
+This version fixes the issues, deduplicates, avoids O(M²) printing, and warns about huge ranges.
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+class MissingNumberFinder
+{
+    static void Main()
+    {
+        Console.WriteLine("Enter the count of integers your sequence has:");
+        string input = Console.ReadLine()?.Trim();
+        if (string.IsNullOrEmpty(input) || !int.TryParse(input, out int N))
+        {
+            Console.WriteLine("Enter Valid Input");
+            return;
+        }
+
+        if (N < 1 || N > 200000)
+        {
+            Console.WriteLine("Num not in range");
+            return;
+        }
+
+        Console.WriteLine("Enter the space-separated distinct integers in range [-10^9 to 10^9]");
+        string sequence = Console.ReadLine() ?? "";
+        string[] tokens = sequence.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (tokens.Length != N)
+        {
+            // optional: enforce count
+            // Console.WriteLine("Count of numbers submitted doesn't match initial value.");
+            // return;
+            // or just proceed with parsed tokens
+        }
+
+        var list = new List<int>(tokens.Length);
+        foreach (var t in tokens)
+        {
+            if (!int.TryParse(t, out int v))
+            {
+                Console.WriteLine("Not a num");
+                return;
+            }
+            list.Add(v);
+        }
+
+        // Deduplicate and sort
+        int[] arr = list.Distinct().OrderBy(x => x).ToArray();
+        if (arr.Length <= 1)
+        {
+            Console.WriteLine("None missing");
+            return;
+        }
+
+        // Quick safe-check: if range too large, bail out
+        long range = (long)arr[arr.Length - 1] - (long)arr[0] - (arr.Length - 1);
+        if (range > 10_000_000) // threshold you decide
+        {
+            Console.WriteLine("Range of missing numbers too large to list.");
+            return;
+        }
+
+        var missing = new List<int>();
+        for (int i = 0; i < arr.Length - 1; i++)
+        {
+            int a = arr[i];
+            int b = arr[i + 1];
+            if (b - a > 1)
+            {
+                for (int x = a + 1; x < b; x++)
+                    missing.Add(x);
+            }
+        }
+
+        if (missing.Count == 0)
+        {
+            Console.WriteLine("None missing");
+        }
+        else
+        {
+            Console.WriteLine(string.Join(",", missing));
+        }
+    }
+}
+```
+
+Notes on this version:
+
+- Uses `Distinct()` to remove duplicates.
+- Uses `OrderBy`/`ToArray` for single-sort.
+- Checks for absurdly large missing range and refuses to list if too large. Change threshold as needed.
+- Uses `string.Join` for O(M) printing.
+
+---
+
+### 4) Complexity and memory
+
+- **Time:** Sorting dominates `O(K log K)` where `K` is number of parsed integers (<= N). Building missing list loops over adjacent gaps and appends M missing numbers. So total time `O(K log K + M)`.
+- **Memory:** `O(K + M)` to store array and missing list. If M is huge the program will run out of memory. That is why a range check is important.
+
+---
+
+### 5) Edge cases to test / handle
+
+- Single element input (e.g., `1` and value `5`) → output `"None missing"`.
+- All consecutive numbers → `"None missing"`.
+- Duplicates in input → deduplicate or validate and reject.
+- Very large gaps → avoid constructing billions of ints. Prefer streaming output (but streaming a billion numbers is still infeasible).
+- Negative numbers and negative-to-positive ranges work fine.
+- Non-matching `N` vs actual tokens → decide whether to enforce.
+
+---
+
+### 6) Alternative approach (space-efficient printing)
+
+If you must print results but cannot afford storing all missing numbers, stream them directly while iterating gaps and write commas carefully:
+
+```csharp
+bool firstOut = true;
+for (...) {
+  for (int x = a + 1; x < b; x++) {
+    if (!firstOut) Console.Write(",");
+    Console.Write(x);
+    firstOut = false;
+  }
+}
+if (firstOut) Console.WriteLine("None missing");
+```
+
+This avoids storing `missing` but still cannot handle astronomically large ranges.
+
+---
+
 ## C# (using Visual Studio 2022)
 
-- <https://www.geeksforgeeks.org/c-sharp/collections-in-c-sharp/>
-- <https://www.w3schools.com/cs/cs_oop.php>
 - Masterclass notes (make it possible)
 - revise self notes
 
-## Immediate TO-DO's
+## Fresher Major topics
 
 - JavaScript fundamentals: data types, dynamic typing, primitives vs. non‑primitives, immutability, arrays, objects, functions, scope (`var`, `let`, `const`), loops (`for`, `while`, `do‑while`, `for‑of`, `for‑in`), function types (named, anonymous, expressions, arrow, callbacks, higher‑order), event handling (`addEventListener`), asynchronous vs. synchronous execution, `map` method  
 - C# Object‑Oriented Programming: OOP pillars (Abstraction, Polymorphism, Inheritance, Encapsulation), access modifiers (`private`, `protected`, `public`, `internal`), “is‑a” relationship, class vs. object, upcoming C# topics (interfaces, abstract classes, virtual methods, method overriding/overloading)  
@@ -201,7 +505,7 @@ div { transition: all 0.3s ease; }
 let arr = [1,2,3];
 arr.map(x => x*2);
 
-let person = {name:'Amaan', age:25};
+let person = {name:'Salaam', age:25};
 console.log(person.name);
 ```
 
@@ -483,7 +787,3 @@ Even as a fresher, you’ll get:
 | **Day 7**   | Mock Q&A — C#, Frontend, Projects, HR                           |
 
 ---
-
-Would you like me to:
-
-1. Generate a **daily Q&A sheet** (C#, JS, HTML/CSS, Git, Projects, HR) for mock interview practice,
