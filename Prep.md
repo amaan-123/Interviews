@@ -6,6 +6,7 @@
 - JOIN query: two tables: employee & department, write select statement
 - Can objects be created for abstract classes
 - Two different inherited interfaces with the same property "Name", implemented by another derived class
+- I was asked a question in interview: "When you mentioned that C# is multi-threaded, unlike JS & can use async-await syntax which JS can too. Do you know about concurrency? For example UI three elements should show together "(just an overview, not going in-depth)
 
 Direct answers below, concise and correct.
 
@@ -134,6 +135,148 @@ void IB.Do() { /* IB behavior */ }
 
 In **Java**: if both interfaces declare the same method signature (no conflict) a single class method satisfies both. To provide different behaviors you must use helper methods or adapter objects because Java does not support explicit interface implementation like C#. If interfaces have `default` methods with different implementations, the class must override and resolve the conflict by providing its own method.
 
+---
+
+### 🔹 6. What is *Concurrency*?
+
+The interviewer was testing whether you understand the *conceptual difference* between **asynchronous execution** (e.g., JS `async/await`) and **true concurrency or parallelism** (which C# can actually do).
+
+**Concurrency** means:
+
+> A system’s ability to *handle multiple tasks logically at the same time.*
+
+It doesn’t necessarily mean they’re all running *physically* at the same time — just that progress can be made on multiple tasks *overlapping in time.*
+
+🧠 **Think:** “multitasking” in software — one task may pause while another runs.
+
+---
+
+#### 🔸 Concurrency vs Parallelism
+
+| Concept         | Description                                                                              | Example                                                                   |
+| --------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Concurrency** | Managing *multiple tasks* that can start, run, and complete in overlapping time periods. | A web server handling multiple client requests by switching between them. |
+| **Parallelism** | Running *multiple tasks simultaneously* on *different CPU cores*.                        | Doing image processing on multiple cores at once.                         |
+
+Concurrency is about **structure** (designing code that can deal with multiple things at once).
+Parallelism is about **execution** (actually running things simultaneously on hardware).
+
+---
+
+### 🔹 How does C# implement concurrency?
+
+✅ **Yes, C# supports true concurrency.**
+
+It offers both **asynchronous** (non-blocking) and **parallel** (multi-threaded) models.
+
+#### a) Asynchronous concurrency (logical overlap)
+
+Using **`async` / `await`**, you can let the program do other work while waiting for something slow (like a network or file operation):
+
+```csharp
+async Task GetDataAsync()
+{
+    var data1 = GetFromApiAsync("A");
+    var data2 = GetFromApiAsync("B");
+    var data3 = GetFromApiAsync("C");
+
+    // run all concurrently, not sequentially
+    await Task.WhenAll(data1, data2, data3);
+}
+```
+
+Here, the three API calls are *concurrent* — the program doesn’t block for each one.
+They share the same thread logically (asynchronous I/O).
+
+---
+
+#### b) Parallel concurrency (true multi-threading)
+
+C# can also run multiple pieces of code *physically* at the same time — using multiple threads or CPU cores.
+
+```csharp
+Parallel.Invoke(
+    () => RenderUI("Header"),
+    () => RenderUI("Sidebar"),
+    () => RenderUI("Footer")
+);
+```
+
+Each runs on a different thread → **true concurrency & parallelism.**
+
+Behind the scenes, C# uses:
+
+- **`System.Threading.Thread`**
+- **`Task Parallel Library (TPL)`**
+- **`Parallel.For / Parallel.ForEach`**
+- **`async` / `await`** for asynchronous task coordination
+
+So C# supports both:
+
+- **Asynchronous concurrency** (via `Task`, `await`)
+- **Parallel concurrency** (via multiple threads/cores)
+
+---
+
+### 🔹 How does JavaScript handle this?
+
+✅ **JavaScript supports concurrency**,
+❌ **but not true multi-threading** (in normal environments).
+
+It’s **single-threaded** (one main thread) but uses an **event loop** to handle multiple asynchronous operations concurrently.
+
+```javascript
+async function loadUI() {
+  const [a, b, c] = await Promise.all([
+    fetchData('A'),
+    fetchData('B'),
+    fetchData('C')
+  ]);
+}
+```
+
+Here, JavaScript performs **asynchronous concurrency** using **Promises**, but still runs on **one main thread**.
+
+🧩 JS uses:
+
+- **Event loop + callback queue + microtask queue**
+- **Web APIs** (for timers, I/O)
+- **Web Workers** (for rare true parallelism)
+
+So JS has **concurrent async behavior**, but **not multi-threaded** like C# unless you manually use Web Workers.
+
+---
+
+### 🔹 Relating this to the “UI three elements show together” example
+
+**If UI has three elements (A, B, C) to load at once:**
+
+| Language       | How it works                                                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **JavaScript** | You’d use `Promise.all([A, B, C])` — all load concurrently (non-blocking I/O), but on one thread.                                             |
+| **C#**         | You can use `await Task.WhenAll(A, B, C)` — same non-blocking concurrency. <br>Or `Parallel.Invoke(A, B, C)` — true multi-threaded execution. |
+
+So both languages can **load UI elements together**,
+but **C# can do it in parallel threads** if needed,
+while **JS only overlaps tasks logically via its event loop**.
+
+---
+
+### 🔹 Big-picture relevance (broad programming context)
+
+| Concept                       | Description                                                   | Common in                |
+| ----------------------------- | ------------------------------------------------------------- | ------------------------ |
+| **Asynchronous programming**  | Non-blocking code that continues while waiting (I/O, network) | JS, C#, Python, Node.js  |
+| **Multithreading**            | Multiple threads run in parallel                              | C#, Java, C++, Go        |
+| **Concurrency model**         | The design that manages multiple overlapping tasks            | All high-level languages |
+| **Event loop concurrency**    | Single-threaded, async callbacks                              | JavaScript, Node.js      |
+| **Preemptive multithreading** | True parallel threads managed by OS                           | C#, Java, C++            |
+
+---
+
+✅ **Summary answer (what you’d say in interview):**
+
+> “Concurrency is the ability of a program to manage multiple tasks at once. In C#, it’s supported both asynchronously (`async/await`) and through true multi-threading (`Task`, `Thread`, `Parallel`). JavaScript, however, is single-threaded — it achieves concurrency through its event loop and asynchronous callbacks, but not actual parallel threads. So C# can execute work in parallel, while JS just schedules tasks concurrently.”
 ---
 
 # C# Logical test code review
